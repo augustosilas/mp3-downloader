@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  redis:
+    image: redis
+    container_name: bull-redis
+    restart: always
+    networks:
+      - net-bridge
+    ports:
+      - "6379:6379"
+    expose:
+     - 6379
+  api:
+    image: silascarmo/mp3-downloader:2
+    container_name: mp3-down
+    build: .
+    command: "npm start"
+    networks:
+      - net-bridge
+    ports:
+      - "3000:3000"
+    environment:
+      - REDIS_PORT=6379
+      - REDIS_HOST=localhost
+    depends_on:
+      - redis
+
+networks:
+  net-bridge:
+    driver: bridge
+    
+    
