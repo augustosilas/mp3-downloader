@@ -1,6 +1,7 @@
 import Bull from "bull";
 import ytdl from "ytdl-core";
 import fs from "fs";
+import { join } from "path";
 
 class DownloadQueue {
   private queue: Bull.Queue;
@@ -16,24 +17,24 @@ class DownloadQueue {
   private createQueue() {
     return new Bull("download audio", {
       redis: {
-        host: process.env.REDIS_HOST,
-        port: process.env.REDIS_PORT,
+        host: process.env.REDIS_HOST ?? "localhost",
+        port: process.env.REDIS_PORT ?? 6379,
       },
     });
   }
 
   private async process() {
-    await this.queue.process(async (job, done) => {
+    this.queue.process(async (job, done) => {
       const { url } = job.data;
 
       const info = await ytdl.getBasicInfo(url);
 
       const title = info.videoDetails.title;
 
-      const path = `C:/Users/augus/Music/`;
+      const path = `${process.cwd()}/src/downloads/`;
       const newFilename = `${title}.mp3`;
 
-      const pathfile = path + newFilename;
+      const pathfile = join(path, newFilename);
 
       ytdl(url, { quality: "highestaudio", filter: "audioonly" })
         .pipe(fs.createWriteStream(pathfile))
