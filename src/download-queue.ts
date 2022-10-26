@@ -29,7 +29,7 @@ class DownloadQueue {
 
       const info = await ytdl.getBasicInfo(url);
 
-      const title = info.videoDetails.title;
+      const title = info.videoDetails.title.replace("/", " ");
 
       const path = `${process.cwd()}/src/downloads/`;
       const newFilename = `${title}.mp3`;
